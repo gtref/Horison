@@ -1,4 +1,4 @@
-# Horizon Kernel
+# Horizon Kernel AARCH64 edition
 
 >[!WARNING]
 > This version of Horizon Kernel has not been compiled or tested so use at your own risk.
