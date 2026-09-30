@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horizon Kernel AARCH64 - Documentation</title>
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #1f2937;
+      --card-bg: #f9fafb;
+      --border-color: #e5e7eb;
+      --accent-color: #2563eb;
+      --code-bg: #1e1e1e;
+      --code-text: #d4d4d4;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0f172a;
+      --text-color: #f3f4f6;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --accent-color: #3b82f6;
+      --code-bg: #090d16;
+      --code-text: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--card-bg);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      color: var(--accent-color);
+    }
+
+    .theme-toggle {
+      background: var(--accent-color);
+      color: #ffffff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .theme-toggle:hover {
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin-top: 0;
+      border-bottom: 2px solid var(--accent-color);
+      padding-bottom: 0.5rem;
+      color: var(--text-color);
+    }
+
+    pre {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      padding: 1rem;
+      border-radius: 0.375rem;
+      overflow-x: auto;
+      font-family: "Courier New", Courier, monospace;
+    }
+
+    code {
+      font-family: "Courier New", Courier, monospace;
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border-color);
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Horizon Kernel AARCH64</h1>
+    <button class="theme-toggle" id="themeToggle">Toggle Dark Mode</button>
+  </header>
+
+  <main>
+    <section>
+      <h2>Overview</h2>
+      <p>
+        <strong>Horizon Kernel</strong> is an operating system kernel written in
+        <a href="https://ziglang.org/" target="_blank" style="color: var(--accent-color);">Zig</a>
+        targeting the AARCH64 (64-bit ARM) architecture.
+      </p>
+    </section>
+
+    <section>
+      <h2>Building and Running on Linux</h2>
+      <ol>
+        <li>
+          <strong>Install QEMU</strong>
+          <pre><code>sudo apt update
+sudo apt install qemu-system-arm qemu-system-misc</code></pre>
+        </li>
+        <li>
+          <strong>Install Zig</strong>
+          <p>Download Zig 0.13.0 or later from <a href="https://ziglang.org/download/" target="_blank" style="color: var(--accent-color);">ziglang.org</a> and add it to your <code>PATH</code>.</p>
+        </li>
+        <li>
+          <strong>Build the kernel</strong>
+          <pre><code>zig build</code></pre>
+        </li>
+        <li>
+          <strong>Run in QEMU</strong>
+          <pre><code>zig build run</code></pre>
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Building and Running on Windows</h2>
+      <ol>
+        <li>
+          <strong>Install QEMU</strong>
+          <p>Open an admin PowerShell prompt and run:</p>
+          <pre><code>winget install --id SoftwareFreedomConservancy.QEMU -e</code></pre>
+        </li>
+        <li>
+          <strong>Add QEMU to PATH</strong>
+          <pre><code>setx PATH "$($env:PATH);C:\Program Files\qemu"</code></pre>
+        </li>
+        <li>
+          <strong>Install Zig</strong>
+          <pre><code>winget install --id zig.zig</code></pre>
+        </li>
+        <li>
+          <strong>Build and Run</strong>
+          <pre><code>zig build
+zig build run</code></pre>
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Project Architecture</h2>
+      <ul>
+        <li><code>src/start.zig</code>: Kernel entry point (<code>_start</code>) and main loop.</li>
+        <li><code>src/mmio.zig</code>: MMIO read/write functions for hardware interaction.</li>
+        <li><code>build.zig</code>: Zig 0.13 build definition and QEMU run target.</li>
+        <li><code>kernel.ld</code>: Linker script mapping physical memory address at 0x80000.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Horizon Kernel Documentation - Published via GitHub Pages</p>
+  </footer>
+
+  <script>
+    const toggleBtn = document.getElementById('themeToggle');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+
+    if (currentTheme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    toggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const newTheme = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+  </script>
+</body>
+</html>
