@@ -1,38 +1,33 @@
 const std = @import("std");
-const Build = @import("Build.zig");
-
-// Your custom Target struct must exist somewhere in your project.
-// Example:
-pub const Target = struct {
-    arch: std.Target.Cpu.Arch,
-    os: std.Target.Os.Tag,
-};
 
 pub fn build(b: *std.Build) void {
-    // Initialize your custom build context
-    var ctx = Build.Context.init(b);
-
-    // Use your custom Target type (no zig.zig)
-    const target = Target{
-        .arch = .aarch64,
-        .os = .freestanding,
-    };
-
-    const exe = ctx.addExecutable(.{
-        .name = "kernel",
-        .root = "src/start.zig",
-        .target = target,
-        .opt = .ReleaseSmall,
+    const target = b.resolveTargetQuery(.{
+        .cpu_arch = .aarch64,
+        .os_tag = .freestanding,
+        .abi = .none,
     });
 
-    exe.setLinker("kernel.ld");
-    exe.emitBin("kernel8.img");
+    const optimize = b.standardOptimizeOption(.{});
 
-    ctx.install(exe);
+    const exe = b.addExecutable(.{
+        .name = "kernel",
+        .root_source_file = b.path("src/start.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+
+    exe.setLinkerScript(b.path("kernel.ld"));
+
+    const install_cmd = b.addInstallArtifact(exe, .{});
+    b.getInstallStep().dependOn(&install_cmd.step);
+
+    // Copy elf executable as kernel8.img into zig-out/bin
+    const bin = b.addInstallBinFile(exe.getEmittedBin(), "kernel8.img");
+    b.getInstallStep().dependOn(&bin.step);
 
     // QEMU run step
     const run_step = b.step("run", "Run kernel in QEMU");
-    run_step.dependOn(&exe.step);
+    run_step.dependOn(&bin.step);
 
     const qemu_cmd = b.addSystemCommand(&.{
         "qemu-system-aarch64",
@@ -43,7 +38,7 @@ pub fn build(b: *std.Build) void {
         "-m",
         "1024",
         "-kernel",
-        "kernel8.img",
+        "zig-out/bin/kernel8.img",
         "-nographic",
     });
 

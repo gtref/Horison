@@ -1,9 +1,9 @@
-const std: type = @import("std");
+const std = @import("std");
 
 pub export fn _start() noreturn {
     main();
 }
 
-fn main() void {
-    while (1) {}
+fn main() noreturn {
+    while (true) {}
 }
